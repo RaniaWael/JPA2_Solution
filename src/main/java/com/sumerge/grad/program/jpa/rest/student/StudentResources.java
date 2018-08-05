@@ -186,6 +186,7 @@ public class StudentResources {
     @GET
     @Path("criteria-builder")
     public Response cb() {
+        System.out.println("Please, insert your required data here");
         return criteriaBuilder(null, "ML", null, "EG", "Cairo");
     }
 
@@ -199,17 +200,18 @@ public class StudentResources {
         List<Predicate> preds = new ArrayList<>();
         if (name != null)
             preds.add(c.equal(studentEntity.<String>get("name"),  name));
-        if (courseName != null) {
-            Join<Student, Course> courses = studentEntity.join("courses");
+
+        Join<Student, Course> courses = studentEntity.join("courses");
+
+        if (courseName != null)
             preds.add(c.equal(courses.get("name"), courseName));
+
+        if (instructor != null) {
+            Join<Course, Instructor> stu_instr = courses.join("instructors", JoinType.INNER);
+            preds.add(c.equal(stu_instr.<String>get("name"), instructor));
         }
 
-//        if (instructor != null) {
-//            Join<Student, Instructor> stu_instr = studentEntity.join("courses", JoinType.INNER);
-//            preds.add(c.equal(stu_instr.<String>get("name"), instructor));
-//        }
-
-        Join<Student, Course> addresses = studentEntity.join("addresses");
+        Join<Address, Student> addresses = studentEntity.join("addresses");
 
         if (country != null)
             preds.add(c.equal(addresses.get("country"), country));
