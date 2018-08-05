@@ -2,6 +2,8 @@ package com.sumerge.grad.program.jpa.rest.student;
 
 import com.sumerge.grad.program.jpa.repositories.boundary.Repository;
 import com.sumerge.grad.program.jpa.repositories.entity.Address;
+import com.sumerge.grad.program.jpa.repositories.entity.Course;
+import com.sumerge.grad.program.jpa.repositories.entity.Instructor;
 import com.sumerge.grad.program.jpa.repositories.entity.Student;
 
 import javax.ejb.EJB;
@@ -9,6 +11,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.transaction.UserTransaction;
@@ -23,6 +27,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static com.sumerge.grad.program.jpa.constants.Constants.PERSISTENT_UNIT;
@@ -177,6 +183,46 @@ public class StudentResources {
         }
     }
 
+    @GET
+    @Path("criteria-builder")
+    public Response cb() {
+        return criteriaBuilder(null, "ML", null, "EG", "Cairo");
+    }
+
+    public Response criteriaBuilder(String name, String courseName, String instructor, String country, String city) {
+        CriteriaBuilder c = em.getCriteriaBuilder();
+        CriteriaQuery<Student> criteriaQuery = c.createQuery(Student.class);
+        Root<Student> studentEntity = criteriaQuery.from(Student.class);
+
+        // Add the predicates
+        criteriaQuery.select(studentEntity);
+        List<Predicate> preds = new ArrayList<>();
+        if (name != null)
+            preds.add(c.equal(studentEntity.<String>get("name"),  name));
+        if (courseName != null) {
+            Join<Student, Course> courses = studentEntity.join("courses");
+            preds.add(c.equal(courses.get("name"), courseName));
+        }
+
+//        if (instructor != null) {
+//            Join<Student, Instructor> stu_instr = studentEntity.join("courses", JoinType.INNER);
+//            preds.add(c.equal(stu_instr.<String>get("name"), instructor));
+//        }
+
+        Join<Student, Course> addresses = studentEntity.join("addresses");
+
+        if (country != null)
+            preds.add(c.equal(addresses.get("country"), country));
+
+        if (city != null)
+            preds.add(c.equal(addresses.get("city"), city));
+
+        // Executing all predicates
+        criteriaQuery.where(c.and(preds.toArray(new Predicate[preds.size()])));
+        TypedQuery<Student> query = em.createQuery(criteriaQuery);
+        return Response.ok().entity(query.getResultList()).build();
+
+    }
     @POST
     public Response addStudent(Student student) {
         try {

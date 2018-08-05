@@ -100,7 +100,7 @@
                     <bundleDependencies>false</bundleDependencies>
                     <properties>
                         <swarm.bind.address>0.0.0.0</swarm.bind.address>
-                        <swarm.http.port>8888</swarm.http.port>
+                        <swarm.http.port>8880</swarm.http.port>
                     </properties>
                 </configuration>
             </plugin>
