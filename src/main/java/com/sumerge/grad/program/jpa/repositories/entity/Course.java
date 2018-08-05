@@ -46,8 +46,8 @@ public class Course implements Serializable {
 
     @JsonIgnore
     @JoinTable(name = "COURSE_INSTRUCTORS", schema = SCHEMA_NAME,
-            joinColumns = {@JoinColumn(name = "INSTRUCTOR_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
+            joinColumns = {@JoinColumn(name = "COURSE_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "INSTRUCTOR_ID")})
     @ManyToMany(fetch = LAZY, cascade = DETACH)
     private Collection<Instructor> instructors;
 
