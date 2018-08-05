@@ -1,14 +1,12 @@
 package com.sumerge.grad.program.jpa.repositories.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
 
 import static com.sumerge.grad.program.jpa.constants.Constants.SCHEMA_NAME;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -24,9 +22,9 @@ public class Instructor implements Serializable {
 
     @Column(name = "NAME")
     private String name;
-//
-//    @ManyToMany(fetch = LAZY, targetEntity = Course.class, mappedBy = "instructors")
-//    private Collection<Course> courses;
+
+    @ManyToMany(fetch = LAZY, targetEntity = Course.class, mappedBy = "instructors")
+    private Collection<Course> courses;
 
     public Long getId() {
         return id;
@@ -44,13 +42,13 @@ public class Instructor implements Serializable {
         this.name = name;
     }
 
-//    public Collection<Course> getCourses() {
-//        return courses;
-//    }
-//
-//    public void setCourses(Collection<Course> courses) {
-//        this.courses = courses;
-//    }
+    public Collection<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Collection<Course> courses) {
+        this.courses = courses;
+    }
 
     @Override
     public boolean equals(Object o) {
